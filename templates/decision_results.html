@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Kết Quả Quyết Định: {{ results.decision_info.decision_name if results and results.decision_info else "Không rõ" }}{% endblock %}
+
+{% block content %}
+    {% if results and results.decision_info %}
+        <h2>Kết Quả Phân Tích AHP cho: {{ results.decision_info.decision_name }}</h2>
+        <p><em>(Quyết định ID: {{ results.decision_info.decision_id }}, Lưu ngày: {{ results.decision_info.creation_date.strftime('%d-%m-%Y %H:%M') if results.decision_info.creation_date else 'N/A' }})</em></p>
+        <p>Mô tả: {{ results.decision_info.description or "Không có mô tả."}}</p>
+    {% else %}
+        <h2>Không tìm thấy thông tin quyết định</h2>
+    {% endif %}
+
+    {% if results %}
+        {# Hiển thị Ma trận so sánh tiêu chí nếu có dữ liệu #}
+        {% if results.comparison_matrix and results.criteria_names and results.comparison_matrix|length == results.criteria_names|length %}
+        <h3>Ma trận So sánh Cặp Tiêu chí (Đã lưu)</h3>
+        <table class="comparison-matrix">
+             <thead>
+                <tr>
+                    <th>Tiêu chí</th>
+                    {% for crit_name in results.criteria_names %}
+                    <th>{{ crit_name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for i in range(results.criteria_names|length) %}
+            <tr>
+                <td><strong>{{ results.criteria_names[i] }}</strong></td>
+                {% for j in range(results.criteria_names|length) %}
+                <td>
+                    {# Đảm bảo truy cập phần tử trong ma trận một cách an toàn #}
+                    {{ "%.4f"|format(results.comparison_matrix[i][j]) if results.comparison_matrix[i] and j < results.comparison_matrix[i]|length else 'N/A' }}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p><em>Không có dữ liệu chi tiết ma trận so sánh tiêu chí được lưu hoặc dữ liệu không đầy đủ.</em></p>
+        {% endif %}
+
+        <h3>Thông số Ma trận Tiêu chí (Đã lưu)</h3>
+        <p>Tỷ số nhất quán (CR): 
+            {% if results.cr is not none %} {# SỬA Ở ĐÂY: dùng results.cr #}
+                {{ "%.4f"|format(results.cr) }}
+                <span style="font-weight: bold;color:{%if results.cr <=0.1%}green{%else%}red{%endif%};">
+                    ({%if results.cr <=0.1%}Đạt nhất quán{%else%}KHÔNG đạt nhất quán{%endif%})
+                </span>
+            {% else %}
+                Không có dữ liệu CR
+            {% endif %}
+        </p>
+        <h3>Trọng số các Tiêu chí (Đã lưu)</h3>
+        {% if results.criteria_names and results.criteria_weights and results.criteria_names|length == results.criteria_weights|length %}
+         <table>
+            <thead><tr><th>Tiêu chí</th><th>Trọng số</th></tr></thead>
+            <tbody>
+             {% for i in range(results.criteria_names|length) %}
+             <tr>
+                <td>{{ results.criteria_names[i] }}</td>
+                <td>{{ "%.4f"|format(results.criteria_weights[i]) if results.criteria_weights[i] is not none else 'N/A' }}</td>
+            </tr>
+             {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p><em>Không có dữ liệu trọng số tiêu chí hoặc dữ liệu không khớp.</em></p>
+        {% endif %}
+
+
+        <h3>Bảng Kết Quả Chi Tiết Phương Án (Đã lưu)</h3>
+        {% if results.ranked_alternatives %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Hạng</th>
+                    <th>Tên Phương án</th>
+                    {% for cn_h in results.criteria_names %}<th>{{cn_h}}(Gốc)</th>{% endfor %}
+                    {% for cn_h in results.criteria_names %}<th>{{cn_h}}(CH)</th>{% endfor %}
+                    <th>Điểm Tổng Hợp</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for alt in results.ranked_alternatives %}
+            <tr>
+                <td>{{ alt.rank_value if alt.rank_value is not none else alt.get('rank', 'N/A') }}</td>
+                <td>{{ alt.alternative_name if alt.alternative_name is not none else alt.get('name', 'N/A') }}</td>
+                {# Hiển thị điểm gốc và chuẩn hóa từ scores_detail, đảm bảo đúng thứ tự tiêu chí #}
+                {% for crit_name_expected in results.criteria_names %}
+                    {% set raw_score_val = namespace(value='N/A') %}
+                    {% for score_item in alt.scores_detail if score_item.criterion_name == crit_name_expected %}
+                        {% if score_item.raw_score is not none %}{% set raw_score_val.value = "%.2f"|format(score_item.raw_score) %}{% endif %}
+                    {% endfor %}
+                    <td>{{ raw_score_val.value }}</td>
+                {% endfor %}
+                {% for crit_name_expected in results.criteria_names %}
+                    {% set norm_score_val = namespace(value='N/A') %} {# Đổi tên biến namespace để tránh xung đột nếu cần #}
+                    {% for score_item_norm in alt.scores_detail if score_item_norm.criterion_name == crit_name_expected %}
+                        {% if score_item_norm.normalized_score is not none %}{% set norm_score_val.value = "%.4f"|format(score_item_norm.normalized_score) %}{% endif %}
+                    {% endfor %}
+                    <td>{{ norm_score_val.value }}</td>
+                {% endfor %}
+                <td><strong>{{ "%.4f"|format(alt.overall_score) if alt.overall_score is not none else 'N/A' }}</strong></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Không có dữ liệu phương án cho quyết định này.</p>
+        {% endif %}
+
+        {% if results.ranked_alternatives and results.ranked_alternatives[0].overall_score is not none %}
+        <h3 style="color: green; margin-top: 15px;">🏆 Phương án được đề xuất: {{ results.ranked_alternatives[0].alternative_name }} (Điểm: {{ "%.4f"|format(results.ranked_alternatives[0].overall_score) }})</h3>
+        {% endif %}
+
+        <hr>
+        <h2>Biểu Đồ Trực Quan (Từ Dữ Liệu Đã Lưu)</h2>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+            <div style="width: 45%; min-width: 300px; margin-bottom: 20px;">
+                <h3>Biểu đồ Trọng số Tiêu chí</h3><canvas id="criteriaWeightsChart"></canvas>
+            </div>
+            <div style="width: 45%; min-width: 300px; margin-bottom: 20px;">
+                <h3>Biểu đồ Điểm Tổng hợp Phương án</h3><canvas id="alternativesScoresChart"></canvas>
+            </div>
+        </div>
+    {% else %}
+        <p>Không có dữ liệu kết quả chi tiết để hiển thị cho quyết định này.</p>
+    {% endif %}
+
+    {% if results and results.decision_info %} {# Chỉ hiển thị nút nếu có decision_info #}
+    <div style="margin-top:30px;">
+        <a href="{{ url_for('history') }}" class="button">Quay lại Lịch Sử</a>
+        <a href="{{ url_for('export_excel_history', decision_id=results.decision_info.decision_id) }}" class="button export-button" target="_blank">Xuất Excel Quyết Định Này</a>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chỉ thực hiện nếu các biến results và các key cần thiết tồn tại và có dữ liệu
+    {% if results and results.chart_crit_names and results.chart_crit_weights and results.chart_crit_weights|length > 0 %}
+    try {
+        const criteriaChartData = {
+            labels: JSON.parse('{{ results.chart_crit_names|tojson|safe }}'),
+            datasets: [{ 
+                label: 'Trọng số Tiêu chí', 
+                data: JSON.parse('{{ results.chart_crit_weights|tojson|safe }}'),
+                backgroundColor: ['#FF6384','#36A2EB','#FFCE56','#4BC0C0', '#9966FF', '#FF9F40'], 
+                borderColor:['#fff'], borderWidth:1 
+            }]
+        };
+        const criteriaCtx = document.getElementById('criteriaWeightsChart')?.getContext('2d');
+        if(criteriaCtx) {
+            new Chart(criteriaCtx, {type:'pie',data:criteriaChartData,options:{responsive:true,plugins:{legend:{position:'top'}}}});
+        }
+    } catch (e) { console.error("Lỗi vẽ biểu đồ tiêu chí (từ lịch sử):", e); }
+    {% else %}
+        console.log("Không đủ dữ liệu để vẽ biểu đồ trọng số tiêu chí.");
+    {% endif %}
+
+    {% if results and results.chart_alt_names and results.chart_alt_scores and results.chart_alt_scores|length > 0 %}
+    try {
+        const alternativesChartData = {
+            labels: JSON.parse('{{ results.chart_alt_names|tojson|safe }}'),
+            datasets: [{ 
+                label: 'Điểm Tổng hợp Phương án', 
+                data: JSON.parse('{{ results.chart_alt_scores|tojson|safe }}'),
+                backgroundColor:'#4BC0C0', borderColor:'#30a0a0', borderWidth:1 
+            }]
+        };
+        const alternativesCtx = document.getElementById('alternativesScoresChart')?.getContext('2d');
+        if(alternativesCtx) {
+            new Chart(alternativesCtx, {type:'bar',data:alternativesChartData,options:{responsive:true,scales:{y:{beginAtZero:true}}}});
+        }
+    } catch (e) { console.error("Lỗi vẽ biểu đồ phương án (từ lịch sử):", e); }
+    {% else %}
+        console.log("Không đủ dữ liệu để vẽ biểu đồ điểm phương án.");
+    {% endif %}
+});
+</script>
+{% endblock %}

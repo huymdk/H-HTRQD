@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Lịch Sử Quyết Định AHP{% endblock %}
+
+{% block content %}
+    <h2>Lịch Sử Các Quyết Định Đã Lưu</h2>
+
+    {% if decisions %}
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên Quyết Định</th>
+                    <th>Mô tả</th>
+                    <th>Ngày Tạo</th>
+                    <th>CR Tiêu chí</th>
+                    <th style="width: 280px;">Hành động</th> {# Tăng chiều rộng cột hành động #}
+                </tr>
+            </thead>
+            <tbody>
+                {% for decision in decisions %}
+                <tr>
+                    <td>{{ decision.decision_id }}</td>
+                    <td><a href="{{ url_for('decision_results_page', decision_id=decision.decision_id) }}">{{ decision.decision_name }}</a></td>
+                    <td>{{ decision.description or 'Không có' }}</td>
+                    <td>{{ decision.creation_date.strftime('%d-%m-%Y %H:%M') if decision.creation_date else 'N/A' }}</td>
+                    <td>
+                        {% if decision.criteria_cr is not none %}
+                            {{ "%.4f"|format(decision.criteria_cr) }}
+                            <span style="font-weight: bold; color: {% if decision.criteria_cr <= 0.1 %}green{% else %}red{% endif %};">
+                                ({% if decision.criteria_cr <= 0.1 %}Nhất quán{% else %}Không{% endif %})
+                            </span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('decision_results_page', decision_id=decision.decision_id) }}" class="button view-button">Xem</a>
+                        <a href="{{ url_for('export_excel_history', decision_id=decision.decision_id) }}" class="button export-button" target="_blank">Excel</a>
+                        <form method="POST" action="{{ url_for('delete_history_entry', decision_id=decision.decision_id) }}" style="display:inline; margin-left: 5px;">
+                            <button type="submit" onclick="return confirm('Xóa quyết định ID {{ decision.decision_id }}? Hành động này không thể hoàn tác.');" class="button delete-button">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Chưa có quyết định nào được lưu trong lịch sử.</p>
+    {% endif %}
+{% endblock %}

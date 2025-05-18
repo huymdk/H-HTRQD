@@ -1,0 +1,248 @@
+/* File: static/css/style.css */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    color: #343a40;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #007bff;
+}
+
+header h1 a {
+    color: #007bff;
+    text-decoration: none;
+}
+header h1 a:hover {
+    text-decoration: underline;
+}
+
+
+h1, h2, h3 {
+    color: #0056b3;
+}
+h2 { margin-top: 30px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+h3 { margin-top: 20px; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 10px 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    background-color: #e9ecef;
+    font-weight: bold;
+    color: #495057;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+    width: calc(100% - 24px); /* Adjust for padding and border */
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box; /* Important for width calculation */
+}
+input[type="number"]{
+    text-align: right;
+}
+
+.comparison-matrix input[type="text"],
+.comparison-matrix input[type="number"] {
+    width: 60px; /* Hoặc % phù hợp */
+    text-align: center;
+}
+.readonly-input {
+    background-color: #e9ecef;
+    color: #495057;
+    border: 1px solid #ced4da;
+}
+ .auto-filled {
+    font-style: italic;
+    color: #6c757d;
+}
+
+
+.button, button[type="submit"] {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+
+.button:hover, button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.button.export {
+    background-color: #28a745;
+}
+.button.export:hover {
+    background-color: #1e7e34;
+}
+
+
+.flash-messages {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.flash-messages li {
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.flash-messages .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.flash-messages .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.flash-messages .warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.flash-messages .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+hr {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    color: #6c757d;
+}
+/* CSS cho bảng điểm phương án */
+#alternativesTable th, #alternativesTable td {
+    min-width: 80px; /* Đảm bảo các cột không quá hẹp */
+}
+#alternativesTable input[type="text"],
+#alternativesTable input[type="number"] {
+     width: calc(100% - 20px); /* Điều chỉnh cho vừa ô */
+}
+.crit-type-select {
+    font-size: 0.8em;
+    padding: 4px;
+    width: auto; /* Để select vừa với nội dung */
+}
+/* File: static/css/style.css */
+/* (Giữ lại CSS từ phiên bản trước và thêm/sửa các phần sau) */
+
+/* ... (CSS body, container, header h1, h2, h3, table, th, td, form-group, inputs, comparison-matrix, buttons, flash-messages, hr, footer giữ nguyên) ... */
+
+header nav {
+    margin-top: 10px;
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.nav-link {
+    margin: 0 15px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 0;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-bottom-color 0.2s;
+}
+.nav-link:hover, .nav-link.active { /* Thêm class active nếu muốn highlight trang hiện tại */
+    color: #0056b3;
+    border-bottom-color: #0056b3;
+}
+
+
+/* Style cho bảng lịch sử */
+.history-table th, .history-table td {
+    font-size: 0.95em;
+}
+.history-table .button {
+    font-size: 0.85em;
+    padding: 6px 10px;
+    margin-right: 5px;
+    margin-top: 0; /* Bỏ margin top cho nút trong bảng */
+}
+
+.view-button {
+    background-color: #17a2b8; /* Info color */
+}
+.view-button:hover {
+    background-color: #117a8b;
+}
+
+.export-button { /* Đã có .button.export, có thể dùng chung */
+    background-color: #28a745; /* Success color */
+}
+.export-button:hover {
+    background-color: #1e7e34;
+}
+
+.delete-button {
+    background-color: #dc3545; /* Danger color */
+}
+.delete-button:hover {
+    background-color: #bd2130;
+}
+
+/* Căn giữa cho các nút trong cột Hành động của bảng Lịch sử */
+.history-table td:last-child { /* Giả sử cột hành động là cột cuối */
+    text-align: center;
+}
+.history-table td:last-child form {
+    margin-bottom: 0; /* Bỏ margin của form nếu có */
+}
+
+/* Đảm bảo footer có khoảng cách với nội dung chính */
+main + footer {
+    margin-top: 40px;
+}

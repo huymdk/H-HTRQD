@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hỗ Trợ Quyết Định Mua Đồ Điện Tử (AHP){% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/chart.umd.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><a href="{{ url_for('index') }}">Hệ Hỗ Trợ Ra Quyết Định Mua Đồ Điện Tử (AHP)</a></h1>
+            <nav>
+                <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Trang Chủ (Tính Toán Mới)</a>
+                <a href="{{ url_for('history') }}" class="nav-link {% if request.endpoint == 'history' %}active{% endif %}">Lịch Sử Quyết Định</a>
+            </nav>
+        </header>
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul class="flash-messages">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p>© {{ _datetime.utcnow().year }} - AHP Demo</p>
+        </footer>
+    </div>
+    {# Script tùy chỉnh có thể đặt ở đây hoặc trong block extra_js #}
+    {# <script src="{{ url_for('static', filename='js/custom_charts.js') }}"></script> #}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
